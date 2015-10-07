@@ -57,7 +57,7 @@ class GlusterSetup(ClusterSetup):
 
 def install_gluster(node):
     log.info('Installing gluster packages.')
-    if 'glusterfs 3.5' in node.ssh.execute('gluster --version', silent=True, ignore_exit_status=True, log_output=False):
+    if 'glusterfs 3.5' in node.ssh.execute('gluster --version', silent=True, ignore_exit_status=True, log_output=False)[0]:
         log.info('Gluster already installed, skipping')
     else:
         node.ssh.execute('sudo add-apt-repository ppa:gluster/glusterfs-3.5 -y')
@@ -67,8 +67,8 @@ def install_gluster(node):
 
 def setup_bricks(node):
     log.info('Partitioning and formatting ephemeral drives.')
-    ephemeral_devices = node.ssh.execute('ls /dev/xvd*', silent=True,
-                                         ignore_exit_status=True)  # TODO i'm not sure this logic to find ephemeral_devices applies to non c3.4xlarge...
+    ephemeral_devices = node.ssh.execute('ls /dev/xvda*', silent=True,
+                                         ignore_exit_status=True)  # TODO i'm not sure this logic to find ephemeral_devices applies to non c3 nodes...
     log.info("Gathering devices for bricks: %s" % ', '.join(ephemeral_devices))
 
     for brick_number, device in enumerate(ephemeral_devices):

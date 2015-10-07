@@ -17,3 +17,4 @@ KEY_LOCATION=~/.starcluster/genomekey_key.rsa
 
 [cluster genomekey]
 KEYNAME = genomekey_key
+

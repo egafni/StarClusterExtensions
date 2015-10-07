@@ -1,5 +1,5 @@
 from fabric.api import run
-import datetime
+from datetime import datetime
 
 
 def tobool(x):
@@ -12,8 +12,8 @@ def tobool(x):
     else:
         raise ValueError('Bad bool value: %s' % x)
 
-def apt_update(checkfirst=True):
+def apt_update(force=True):
     s = run('stat -c %y /var/lib/apt/periodic/update-success-stamp')[0]
     dt = datetime.now() - datetime.strptime(s[:10],"%Y-%m-%d")
-    if not checkfirst or dt.days > 2:
+    if force or dt.days > 2:
         run('apt-get update -y')

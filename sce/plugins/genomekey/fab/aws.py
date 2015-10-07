@@ -8,17 +8,27 @@ GENOME_KEY_USER = 'genomekey'
 def apt_get_install(packages):
     return run('apt-get -q -y install %s' % packages)
 
+# class CheckPoint():
+#     def __init__(self, path):
+#         self.path = path
+#     def __enter__(self):
+#         return files.exist(self.path)
+#     def __exit__(self, exc_type, exc_val, exc_tb):
+#         run('touch %s' % self.path)
+
 @task
 def init_node():
     with hide('output'), settings(user='root'):
-        # note can make an AMI to avoid doing this
-        # TODO get rid of this pastebin.  The StarCluster AMI has whack apt sources.
-        run('wget "http://pastebin.com/raw.php?i=uzhrtg5M" -O /etc/apt/sources.list')
-        apt_update(force=True)
+        CP = '/etc/apt/sources.list.updated'
+        if not files.exists(CP):
+            # TODO get rid of this pastebin.  The StarCluster AMI has whack apt sources.
+            run('wget "http://pastebin.com/raw.php?i=uzhrtg5M" -O /etc/apt/sources.list')
+            apt_update(force=True)
+            run('touch %s' % CP)
 
         if not ('Java(TM) SE Runtime Environment' in run('java -version')):
             run('add-apt-repository ppa:webupd8team/java -y')
-            # apt_update(force=True)
+            apt_update(force=True)
 
             # debconf so java install doesn't prompt for license confirmation
             run('echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections')
@@ -49,7 +59,7 @@ def init_master():
         run('pip install awscli')
 
         # For ipython notebook.  Do this last user can get started.  Installing pandas is slow.
-        run('pip install "ipython[notebook]" -U')
+        run('pip install "ipython[notebook]>3"')
 
 
         with settings(user=GENOME_KEY_USER):

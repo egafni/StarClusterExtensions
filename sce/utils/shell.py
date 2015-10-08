@@ -35,7 +35,7 @@ def sed_delete(file,regex,node=None,sudo=False):
         os.system(cmd)
 
 
-def apt_update(node,checkfirst=True):
+def apt_update(node, checkfirst=True):
     """
     apt-update if it hasn't been done in the past few days
     :param checkfirst: if False, skip checking if already apt-updated in the past few days

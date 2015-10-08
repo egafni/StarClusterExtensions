@@ -1,24 +1,34 @@
 from fabric.contrib import files
 from fabric.api import cd, task, run, sudo, settings, hide, shell_env
 import glob
-from ..util import apt_update
+from sce.plugins.genomekey.util import apt_update
 
 GENOME_KEY_USER = 'genomekey'
 
 def apt_get_install(packages):
     return run('apt-get -q -y install %s' % packages)
 
+# class CheckPoint():
+#     def __init__(self, path):
+#         self.path = path
+#     def __enter__(self):
+#         return files.exist(self.path)
+#     def __exit__(self, exc_type, exc_val, exc_tb):
+#         run('touch %s' % self.path)
+
 @task
 def init_node():
     with hide('output'), settings(user='root'):
-        # note can make an AMI to avoid doing this
-        # TODO get rid of this pastebin.  The StarCluster AMI has whack apt sources.
-        run('wget "http://pastebin.com/raw.php?i=uzhrtg5M" -O /etc/apt/sources.list')
-        apt_update(force=True)
+        CP = '/etc/apt/sources.list.updated'
+        if not files.exists(CP):
+            # TODO get rid of this pastebin.  The StarCluster AMI has whack apt sources.
+            run('wget "http://pastebin.com/raw.php?i=uzhrtg5M" -O /etc/apt/sources.list')
+            apt_update(force=True)
+            run('touch %s' % CP)
 
         if not ('Java(TM) SE Runtime Environment' in run('java -version')):
             run('add-apt-repository ppa:webupd8team/java -y')
-            # apt_update(force=True)
+            apt_update(force=True)
 
             # debconf so java install doesn't prompt for license confirmation
             run('echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections')
@@ -28,7 +38,6 @@ def init_node():
 
 
         # setup /scratch.  Currently just using the gluster volume.
-        run('ln -f -s /gluster/gv0/scratch /genomekey/scratch')
         run('ln -f -s /gluster/gv0/analysis /genomekey/analysis')
         run('chown -R genomekey:genomekey /genomekey')  # TODO fix the perms in the ami
 
@@ -44,12 +53,15 @@ def init_master():
     # Note comes after init_node()
 
     with hide('output'), settings(user='root'):
+        run('chown -R genomekey:genomekey /gluster/gv0')
+        run('mkdir -p /gluster/gv0/analysis')
+
         # update apt-list, starcluster AMI is out_dir-of-date
         apt_get_install('graphviz graphviz-dev mbuffer')
         run('pip install awscli')
 
         # For ipython notebook.  Do this last user can get started.  Installing pandas is slow.
-        run('pip install "ipython[notebook]" -U')
+        run('pip install "ipython[notebook]>3"')
 
 
         with settings(user=GENOME_KEY_USER):
@@ -107,32 +119,4 @@ def setup_aws_cli(overwrite=False):
 #
 #             chmod_opt(os.path.join(mount_path, 'opt'))
 #             # '--topic arn:aws:sns:us-west-2:502193849168:genomekey-data --new-queue --mkdir')
-
-@task
-def setup_scratch_space():
-    """
-    Setup RAID0 with all available ephemeral discs
-    """
-    with settings(user='root'):
-        def is_mounted(path):
-            return run('df |grep %s' % path, quiet=True).return_code == 0
-
-        print 'Setting up raid 0 for scratch space'
-
-        if not is_mounted('df |grep /scratch'):
-            apt_get_install("mdadm --no-install-recommends")
-            ephemeral_devices = run('ls /dev/xvd*').split() # TODO i'm not sure this logic to find ephemeral_devices applies to non c3.4xlarge...
-            print 'ephemeral devices: %s' % ephemeral_devices
-            if is_mounted('/mnt'):
-                run('umount /mnt')
-
-            run('mkdir -p /scratch')
-            run('mdadm --create -R --verbose /dev/md0 --level=0 --name=SCRATCH --raid-devices=%s %s' % (len(ephemeral_devices), ' '.join(ephemeral_devices)))
-            run('sudo mkfs.ext4 -L SCRATCH /dev/md0')
-            run('mount LABEL=SCRATCH /scratch')
-            run('chown -R genomekey:genomekey /scratch')
-        else:
-            print '/scratch already mounted, not doing anything'
-
-
 

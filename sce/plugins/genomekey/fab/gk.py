@@ -5,8 +5,8 @@ from fabric.operations import local
 from fabric.state import env
 from fabric.api import run, hide, cd, settings
 import os
-from ..util import tobool
-from . import VE
+from sce.plugins.genomekey.util import tobool
+from sce.plugins.genomekey.fab import VE
 
 
 __author__ = 'erik'
@@ -34,10 +34,10 @@ def copy_genomekey_dev_environ(user='genomekey', reinstall=False):
                     env.key_filename[0], env.user, env.host))
 
             # Upload our .genomekey.conf if one isnt already on server
-            if not files.exists('~/.genomekey.conf'):
-                run('mkdir -p ~/.genomekey')
-                files.upload_template('genomekey.conf',
-                                      '~/.genomekey/genomekey.conf', template_dir='~/.genomekey')
+            # if not files.exists('~/.genomekey.conf'):
+            #     run('mkdir -p ~/.genomekey')
+            #     files.upload_template('genomekey.conf',
+            #                           '~/.genomekey/genomekey.conf', template_dir='~/.genomekey')
 
             # Create VirtualEnv, and install GenomeKey
             with cd('~/projects/GenomeKey'):

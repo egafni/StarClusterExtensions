@@ -20,6 +20,10 @@ from sce import log
 from . import gluster
 from starcluster.clustersetup import ClusterSetup
 from sce.utils.shell import apt_update
+from ...utils.node import execute
+
+
+VOLUME_NAME = 'gv0'
 
 
 class GlusterSetup(ClusterSetup):
@@ -39,25 +43,28 @@ class GlusterSetup(ClusterSetup):
 
     def run(self, nodes, master, user, user_shell, volumes):
         install_gluster(master)
-        if not gluster.volume_exists(master, 'gv0'):
+        if gluster.volume_exists(master, VOLUME_NAME):
+            log.info('volume %s exists, removing' % (VOLUME_NAME))
+
+            master.ssh.execute('gluster volume delete %s --mode=script' % VOLUME_NAME)
+        else:
             setup_bricks(master)
-            gluster.create_and_start_volume(master, 'gv0', self.stripe, self.replicate)
 
-            gluster.mount_volume(master, 'gv0', '/gluster/gv0')
+            gluster.create_and_start_volume(master, VOLUME_NAME, self.stripe, self.replicate)
+            gluster.mount_volume(master, VOLUME_NAME, '/gluster/%s' % VOLUME_NAME)
 
+        execute(master, 'mkdir -p /gluster/gv0/master_scratch')
+        execute(master, 'ln -f -s /gluster/gv0/master_scratch /scratch')
 
 
     def on_add_node(self, node, nodes, master, user, user_shell, volumes):
         install_gluster(node)
-        setup_bricks(node)
-
-        master.ssh.execute('gluster peer probe %s' % node.alias)
-        # node.ssh.execute('')
+        gluster.mount_volume(node, VOLUME_NAME, '/gluster/%s' % VOLUME_NAME)
 
 
 def install_gluster(node):
     log.info('Installing gluster packages.')
-    if 'glusterfs 3.5' in node.ssh.execute('gluster --version', silent=True, ignore_exit_status=True, log_output=False):
+    if 'glusterfs 3.5' in node.ssh.execute('gluster --version', silent=True, ignore_exit_status=True, log_output=False)[0]:
         log.info('Gluster already installed, skipping')
     else:
         node.ssh.execute('sudo add-apt-repository ppa:gluster/glusterfs-3.5 -y')
@@ -67,8 +74,9 @@ def install_gluster(node):
 
 def setup_bricks(node):
     log.info('Partitioning and formatting ephemeral drives.')
-    ephemeral_devices = node.ssh.execute('ls /dev/xvd*', silent=True,
-                                         ignore_exit_status=True)  # TODO i'm not sure this logic to find ephemeral_devices applies to non c3.4xlarge...
+    # TODO i'm not sure if theres a better way to get ephemeral_devices
+    ephemeral_devices = execute(node, 'ls /dev/xvda*',
+                                ignore_exit_status=True)
     log.info("Gathering devices for bricks: %s" % ', '.join(ephemeral_devices))
 
     for brick_number, device in enumerate(ephemeral_devices):
@@ -76,4 +84,4 @@ def setup_bricks(node):
         gluster.mount_brick(node, device, export_path)
 
         # self.pool.simple_job(gluster.mount_brick, (master, device, export_path), jobid=device)
-    # self.pool.wait(len(ephemeral_devices))
+        # self.pool.wait(len(ephemeral_devices))

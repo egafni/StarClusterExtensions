@@ -28,6 +28,7 @@ AVAILABILITY_ZONE = us-west-2a
 disable_queue = True # necessary to customize sge options, it is re-enabled by the sge plugin
 
 # note the order of plugins matters
+# gluster before genomekey so output dirs and symlinks can be setup
 # genomekey needs to be before sge for multiple reasons. For example /scratch must be setup, and genomekey-share must be synced
 PLUGINS = createusers, gluster, genomekey, sge, sge_plus
 PERMISSIONS = ssh, http2, ipython_notebook, ganglia

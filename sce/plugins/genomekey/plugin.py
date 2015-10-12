@@ -43,9 +43,7 @@ class GenomeKeySetup(ClusterSetup):
         if self.setup_master_scratch:
             run_fab(raid0_scratch_space, hosts=master)
 
-
-        print 'ASDFSDF', self.install_dev_environ
-        if os.path.exists(os.path.expanduser('~/projects/GenomeKey')) and os.path.exists(os.path.expanduser('~/projects/Cosmos')) :
+        if os.path.exists(os.path.expanduser('~/projects/GenomeKey')) and os.path.exists(os.path.expanduser('~/projects/Cosmos')):
             run_fab(copy_genomekey_dev_environ, hosts=master)
 
 
@@ -55,9 +53,13 @@ class GenomeKeySetup(ClusterSetup):
         etc_hosts_line = "{0}\t{1}".format(master.ip_address, cluster_name)
         log.info('Consider adding to /etc/hosts: %s' % etc_hosts_line)
 
+        for node in nodes:
+            self.on_add_node(node, nodes, master, user, user_shell, volumes)
+
 
     def on_add_node(self, node, nodes, master, user, user_shell, volumes):
-        raid0_scratch_space(node)
+        if node != master:
+            raid0_scratch_space(node)
 
 
 def raid0_scratch_space(node):
@@ -66,7 +68,7 @@ def raid0_scratch_space(node):
     """
     print 'Setting up raid 0 for scratch space'
 
-    # node.apt_install("mdadm --no-install-recommends")
+    execute(node, "apt-get install mdadm --no-install-recommends -y")
     mount_map = get_mount_map(node)
     if '/dev/md0' in mount_map:
         log.info('/dev/md0 already mounted, skipping')
@@ -76,12 +78,13 @@ def raid0_scratch_space(node):
             if device in mount_map:
                 execute(node, 'umount %s' % mount_map[device])
 
-            execute(node, 'mkdir -p /scratch')
-            execute(node,
-                    'mdadm --create -R --verbose /dev/md0 --level=0 --name=SCRATCH --raid-devices=%s %s' % (len(ephemeral_devices), ' '.join(ephemeral_devices)))
-            execute(node, 'sudo mkfs.ext4 -L SCRATCH /dev/md0')
-            execute(node, 'mount LABEL=SCRATCH /scratch')
-            execute(node, 'chown -R genomekey:genomekey /scratch')
+        execute(node, 'rm -rf /scratch')  # might be a symlink
+        execute(node, 'mkdir /scratch')
+        execute(node,
+                'mdadm --create -R --verbose /dev/md0 --level=0 --name=SCRATCH --raid-devices=%s %s' % (len(ephemeral_devices), ' '.join(ephemeral_devices)))
+        execute(node, 'sudo mkfs.ext4 -L SCRATCH /dev/md0')
+        execute(node, 'mount LABEL=SCRATCH /scratch')
+        execute(node, 'chown -R genomekey:genomekey /scratch')
 
 
 

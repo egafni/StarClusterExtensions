@@ -21,7 +21,7 @@ setup(name='StarClusterExtensions',
       long_description=README,
       packages=find_packages(),
       scripts=['bin/sce'],
-      package_data={'sce': all_files('sce/sge_plus/data') + all_files('sce/erik/data')},
+      package_data={'sce': all_files('sce/plugins/sge_plus/data')},
       install_requires=[
           'starcluster', 'fabric'
       ]

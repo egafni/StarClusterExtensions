@@ -43,7 +43,7 @@ class GlusterSetup(ClusterSetup):
 
     def run(self, nodes, master, user, user_shell, volumes):
         install_gluster(master)
-        execute(master, 'service glusterfs-server start')
+        execute(master, 'service glusterfs-server restart')
 
         if gluster.volume_exists(master, VOLUME_NAME):
             log.info('volume %s exists, removing' % (VOLUME_NAME))

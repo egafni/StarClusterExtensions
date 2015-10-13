@@ -40,6 +40,7 @@ AWS_USER_ID= #your userid
 #AWS_PROXY_USER = yourproxyuser
 #AWS_PROXY_PASS = yourproxypass
 
+
 ###########################
 ## Defining EC2 Keypairs ##
 ###########################

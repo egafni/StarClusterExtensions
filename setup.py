@@ -14,14 +14,14 @@ def all_files(path, num_root_dir_to_skip=1):
 
 
 setup(name='StarClusterExtensions',
-      version='0.2.3',
+      version='0.3.0',
       description="StarCluster Extensions",
       author='Erik Gafni',
       license='MIT',
       long_description=README,
       packages=find_packages(),
       scripts=['bin/sce'],
-      package_data={'sce': all_files('sce/sge_plus/data') + all_files('sce/erik/data')},
+      package_data={'sce': all_files('sce/plugins/sge_plus/data')},
       install_requires=[
           'starcluster', 'fabric'
       ]

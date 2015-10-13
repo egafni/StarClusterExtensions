@@ -43,23 +43,29 @@ class GlusterSetup(ClusterSetup):
 
     def run(self, nodes, master, user, user_shell, volumes):
         install_gluster(master)
+        execute(master, 'service glusterfs-server start')
+
         if gluster.volume_exists(master, VOLUME_NAME):
             log.info('volume %s exists, removing' % (VOLUME_NAME))
+            execute(master, 'gluster volume stop %s --mode=script' % VOLUME_NAME)
+            execute(master, 'gluster volume delete %s --mode=script' % VOLUME_NAME)
 
-            master.ssh.execute('gluster volume delete %s --mode=script' % VOLUME_NAME)
-        else:
-            setup_bricks(master)
+        setup_bricks(master)
 
-            gluster.create_and_start_volume(master, VOLUME_NAME, self.stripe, self.replicate)
-            gluster.mount_volume(master, VOLUME_NAME, '/gluster/%s' % VOLUME_NAME)
+        gluster.create_and_start_volume(master, VOLUME_NAME, self.stripe, self.replicate)
+        gluster.mount_volume(master, VOLUME_NAME, '/gluster/%s' % VOLUME_NAME)
 
         execute(master, 'mkdir -p /gluster/gv0/master_scratch')
         execute(master, 'ln -f -s /gluster/gv0/master_scratch /scratch')
 
+        for node in nodes:
+            self.on_add_node(node, nodes, master, user_shell, volumes)
+
 
     def on_add_node(self, node, nodes, master, user, user_shell, volumes):
-        install_gluster(node)
-        gluster.mount_volume(node, VOLUME_NAME, '/gluster/%s' % VOLUME_NAME)
+        if node != master:
+            install_gluster(node)
+            gluster.mount_volume(node, VOLUME_NAME, '/gluster/%s' % VOLUME_NAME)
 
 
 def install_gluster(node):

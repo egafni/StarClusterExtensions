@@ -21,7 +21,7 @@ def init_node():
     with hide('output'), settings(user='root'):
         CP = '/etc/apt/sources.list.updated'
         if not files.exists(CP):
-            # TODO get rid of this pastebin.  The StarCluster AMI has whack apt sources.
+            # TODO get rid of relying on this pastebin.  The StarCluster AMI has whack apt sources.
             run('wget "http://pastebin.com/raw.php?i=uzhrtg5M" -O /etc/apt/sources.list')
             apt_update(force=True)
             run('touch %s' % CP)
@@ -39,7 +39,8 @@ def init_node():
 
         # setup /scratch.  Currently just using the gluster volume.
         run('ln -f -s /gluster/gv0/analysis /genomekey/analysis')
-        run('chown -R genomekey:genomekey /genomekey')  # TODO fix the perms in the ami
+        run('chown -R genomekey:genomekey /genomekey')
+        run('chown -R genomekey:genomekey /scratch')
 
         # setup_scratch_space() - Using gluster.
 
@@ -53,8 +54,8 @@ def init_master():
     # Note comes after init_node()
 
     with hide('output'), settings(user='root'):
-        run('chown -R genomekey:genomekey /gluster/gv0')
         run('mkdir -p /gluster/gv0/analysis')
+        run('chown -R genomekey:genomekey /gluster/gv0')
 
         # update apt-list, starcluster AMI is out_dir-of-date
         apt_get_install('graphviz graphviz-dev mbuffer')

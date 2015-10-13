@@ -59,7 +59,7 @@ class GlusterSetup(ClusterSetup):
         execute(master, 'ln -f -s /gluster/gv0/master_scratch /scratch')
 
         for node in nodes:
-            self.on_add_node(node, nodes, master, user_shell, volumes)
+            self.on_add_node(node, nodes, master, user, user_shell, volumes)
 
 
     def on_add_node(self, node, nodes, master, user, user_shell, volumes):

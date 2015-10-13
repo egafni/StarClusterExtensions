@@ -17,4 +17,9 @@ KEY_LOCATION=~/.starcluster/genomekey_key.rsa
 
 [cluster genomekey]
 KEYNAME = genomekey_key
+SPOT_BID = 0.50
 
+# Enable to automatically rsync ~/projects/Cosmos and ~/projects/GenomeKey to the cluster
+# [plugin genomekey]
+# install_dev_environ = True
+# SETUP_CLASS = sce.plugins.genomekey.plugin.GenomeKeySetup

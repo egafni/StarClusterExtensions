@@ -43,10 +43,7 @@ class GenomeKeySetup(ClusterSetup):
         if self.setup_master_scratch:
             run_fab(raid0_scratch_space, hosts=master)
 
-        if os.path.exists(os.path.expanduser('~/projects/GenomeKey')) and os.path.exists(os.path.expanduser('~/projects/Cosmos')):
-            run_fab(copy_genomekey_dev_environ, hosts=master)
-
-
+        run_fab(copy_genomekey_dev_environ, hosts=master)
 
         # Print out_dir IP address for the user
         cluster_name = master.parent_cluster.name[4:]

@@ -13,7 +13,7 @@ __author__ = 'erik'
 
 
 @task
-def copy_genomekey_dev_environ(user='genomekey', reinstall=False):
+def copy_genomekey_dev_environ(user='genomekey', reinstall=True):
     reinstall = tobool(reinstall)
     with settings(user=user), hide('output'):
 

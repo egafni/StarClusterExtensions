@@ -20,18 +20,16 @@ def copy_genomekey_dev_environ(user='genomekey', reinstall=False):
         if reinstall:
             run('rm -rf ~/projects/GenomeKey')
 
-        if not (os.path.exists(os.path.expanduser('~/projects/GenomeKey')) and os.path.exists(os.path.expanduser('~/projects/Cosmos'))):
+        if not (os.path.exists(os.path.expanduser('GenomeKey')) and os.path.exists(os.path.expanduser('Cosmos'))):
             print "'WARNING! ~/projects/GenomeKey' and '~/projects/Cosmos' do not exist, cannot do setup"
         else:
             run('mkdir -p ~/projects')
 
-            # Sync Files
-            with cd('~/projects'):
-                # Rsync from local projects
-                local('rsync -avP -e "ssh -o StrictHostKeyChecking=no -i {0}" ~/projects/GenomeKey {1}@{2}:~/projects'.format(
-                    env.key_filename[0], env.user, env.host))
-                local('rsync -avP -e "ssh -o StrictHostKeyChecking=no -i {0}" ~/projects/Cosmos {1}@{2}:~/projects'.format(
-                    env.key_filename[0], env.user, env.host))
+            # Sync Files.  Note, assumes GenomeKey and Cosmos are installed in the CWD
+            local('rsync -avP -e "ssh -o StrictHostKeyChecking=no -i {0}" GenomeKey {1}@{2}:~/projects'.format(
+                env.key_filename[0], env.user, env.host))
+            local('rsync -avP -e "ssh -o StrictHostKeyChecking=no -i {0}" Cosmos {1}@{2}:~/projects'.format(
+                env.key_filename[0], env.user, env.host))
 
             # Upload our .genomekey.conf if one isnt already on server
             # if not files.exists('~/.genomekey.conf'):
@@ -60,4 +58,3 @@ def copy_genomekey_dev_environ(user='genomekey', reinstall=False):
                             run('ln -s ~/projects/GenomeKey/bin/genomekey ~/bin/genomekey')
 
                         # run('~/bin/genomekey initdb')
-

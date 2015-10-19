@@ -21,7 +21,7 @@ def copy_genomekey_dev_environ(user='genomekey', reinstall=True):
             run('rm -rf ~/projects/GenomeKey')
 
         if not (os.path.exists(os.path.expanduser('GenomeKey')) and os.path.exists(os.path.expanduser('Cosmos'))):
-            print "'WARNING! ~/projects/GenomeKey' and '~/projects/Cosmos' do not exist, cannot do setup"
+            raise AssertionError, "'WARNING! ~/projects/GenomeKey' and '~/projects/Cosmos' do not exist, cannot do setup"
         else:
             run('mkdir -p ~/projects')
 

@@ -57,6 +57,9 @@ class SGE_Plus_Setup(ClusterSetup):
         # scratch_mb= sp.check_output('df |grep scratch',shell=True).split()[3]
         scratch_mb=0
 
+        if node.is_master():
+            num_proc = int(num_proc/2)
+
         node.ssh.execute(
             "qconf -rattr exechost complex_values slots={num_proc},num_proc={num_proc},sce_mem={mem}g,sce_scratch={scratch_mb} {node}".format(
                 mem=memtot, num_proc=num_proc, node=node.alias, scratch_mb=scratch_mb)

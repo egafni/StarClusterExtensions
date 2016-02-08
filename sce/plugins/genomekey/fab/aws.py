@@ -35,6 +35,7 @@ def init_node():
             apt_get_install('oracle-java7-installer oracle-java7-set-default')
 
         apt_get_install('libcurl4-openssl-dev')
+        apt_get_install('r-base littler')  # for Rscript
 
 
         # setup /scratch.  Currently just using the gluster volume.

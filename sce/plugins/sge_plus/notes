@@ -1,0 +1,7 @@
+
+qconf -[m,s]c # look at global complex values
+qconf -[m,s]conf # general config
+qconf -se master # list info about a node, including complex values
+
+apt-get install sysstat
+iostat -x 1 3

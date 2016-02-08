@@ -14,7 +14,7 @@ def all_files(path, num_root_dir_to_skip=1):
 
 
 setup(name='StarClusterExtensions',
-      version='0.3.6',
+      version='0.3.7',
       description="StarCluster Extensions",
       author='Erik Gafni',
       license='MIT',

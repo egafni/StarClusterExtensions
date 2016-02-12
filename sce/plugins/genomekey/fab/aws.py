@@ -31,11 +31,12 @@ def init_node():
             apt_update(force=True)
 
             # debconf so java install doesn't prompt for license confirmation
-            run('echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections')
-            apt_get_install('oracle-java7-installer oracle-java7-set-default')
+            run('echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections')
+            apt_get_install('oracle-java8-installer oracle-java8-set-default')
 
         apt_get_install('libcurl4-openssl-dev')
         apt_get_install('r-base littler')  # for Rscript
+        apt_get_install('lynx')
 
 
         # setup /scratch.  Currently just using the gluster volume.

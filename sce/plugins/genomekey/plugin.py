@@ -2,7 +2,7 @@ from starcluster.clustersetup import ClusterSetup
 from starcluster.logger import log
 from fabric.api import execute as fab_execute, env
 import os
-from .fab.aws import init_node, init_master
+from .fab.aws import init_node as init_aws_node, init_master as init_master_node
 from .fab.gk import copy_genomekey_dev_environ
 from .util import tobool
 from sce.utils.node import execute, get_mount_map, get_device_map
@@ -37,9 +37,9 @@ class GenomeKeySetup(ClusterSetup):
     def run(self, nodes, master, user, user_shell, volumes):
         for node in nodes:
             # fab -f init_node -H $hosts
-            run_fab(init_node, hosts=node)
+            run_fab(init_aws_node, hosts=node)
 
-        run_fab(init_master, hosts=master)
+        run_fab(init_aws_master, hosts=master)
         if self.setup_master_scratch:
             run_fab(raid0_scratch_space, hosts=master)
 
@@ -58,6 +58,7 @@ class GenomeKeySetup(ClusterSetup):
         if node != master:
             raid0_scratch_space(node)
 
+        init_aws_node()
 
 def raid0_scratch_space(node):
     """

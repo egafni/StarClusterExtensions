@@ -21,6 +21,7 @@ from . import gluster
 from starcluster.clustersetup import ClusterSetup
 from sce.utils.shell import apt_update
 from ...utils.node import execute
+from sce.utils.misc import trace
 
 
 VOLUME_NAME = 'gv0'
@@ -40,7 +41,7 @@ class GlusterSetup(ClusterSetup):
             self._pool = threadpool.get_thread_pool(4, disable_threads=False)
         return self._pool
 
-
+    @trace
     def run(self, nodes, master, user, user_shell, volumes):
         install_gluster(master)
         execute(master, 'service glusterfs-server restart')
@@ -61,13 +62,13 @@ class GlusterSetup(ClusterSetup):
         for node in nodes:
             self.on_add_node(node, nodes, master, user, user_shell, volumes)
 
-
+    @trace
     def on_add_node(self, node, nodes, master, user, user_shell, volumes):
         if node != master:
             install_gluster(node)
             gluster.mount_volume(node, VOLUME_NAME, '/gluster/%s' % VOLUME_NAME)
 
-
+@trace
 def install_gluster(node):
     log.info('Installing gluster packages.')
     if 'glusterfs 3.5' in node.ssh.execute('gluster --version', silent=True, ignore_exit_status=True, log_output=False)[0]:
@@ -78,7 +79,7 @@ def install_gluster(node):
         apt_update(node, checkfirst=False)
         node.apt_install('glusterfs-server glusterfs-client software-properties-common xfsprogs attr openssh-server')
 
-
+@trace
 def setup_bricks(node):
     log.info('Partitioning and formatting ephemeral drives.')
     # TODO i'm not sure if theres a better way to get ephemeral_devices

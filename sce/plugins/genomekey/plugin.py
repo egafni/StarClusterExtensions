@@ -6,8 +6,9 @@ from .fab.aws import init_node as init_aws_node, init_master as init_master_node
 from .fab.gk import copy_genomekey_dev_environ
 from .util import tobool
 from sce.utils.node import execute, get_mount_map, get_device_map
+from sce.utils.misc import trace
 
-
+@trace
 def run_fab(func, hosts, *args, **kwargs):
     """
     :param hosts: starcluster Nodes
@@ -33,7 +34,7 @@ class GenomeKeySetup(ClusterSetup):
         self.setup_master_scratch = setup_master_scratch
         super(ClusterSetup, self).__init__(**kwargs)
 
-
+    @trace
     def run(self, nodes, master, user, user_shell, volumes):
         for node in nodes:
             # fab -f init_node -H $hosts
@@ -53,19 +54,17 @@ class GenomeKeySetup(ClusterSetup):
         for node in nodes:
             self.on_add_node(node, nodes, master, user, user_shell, volumes)
 
-
+    @trace
     def on_add_node(self, node, nodes, master, user, user_shell, volumes):
         if node != master:
             raid0_scratch_space(node)
 
         init_aws_node()
-
+@trace
 def raid0_scratch_space(node):
     """
     Setup RAID0 with all available ephemeral discs
     """
-    print 'Setting up raid 0 for scratch space'
-
     execute(node, "apt-get install mdadm --no-install-recommends -y")
     mount_map = get_mount_map(node)
     if '/dev/md0' in mount_map:
@@ -83,6 +82,3 @@ def raid0_scratch_space(node):
         execute(node, 'sudo mkfs.ext4 -L SCRATCH /dev/md0')
         execute(node, 'mount LABEL=SCRATCH /scratch')
         execute(node, 'chown -R genomekey:genomekey /scratch')
-
-
-

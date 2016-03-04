@@ -27,7 +27,7 @@ def _trace(f, *args, **kwargs):
     callargs = getcallargs(f, *args, **kwargs)
     callargs.pop('self', None)
     log.info(
-        '{0}({1})'.format(
+        'TRACE: {0}({1})'.format(
             f.__name__,
             ', '.join(
                 map(lambda i: '{0[0]}={0[1]}'.format(i), callargs.items())

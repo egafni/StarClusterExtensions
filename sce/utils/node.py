@@ -1,4 +1,5 @@
 import re
+from sce.utils.misc import trace
 
 def cluster_name(node):
     return node.parent_cluster.name.replace('@sc-', '')
@@ -11,7 +12,7 @@ def node_str_to_node(cluster, node_str):
         return filter(lambda n: n.alias == node_str, cluster.nodes)[0]
 
 
-
+@trace
 def execute(node, cmd, silent=True, log_output=True, **kwargs):
     return node.ssh.execute(cmd, silent=silent, log_output=log_output, **kwargs)
 

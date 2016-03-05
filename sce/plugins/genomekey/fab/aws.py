@@ -26,7 +26,7 @@ def init_node():
             apt_update(force=True)
             run('touch %s' % CP)
 
-        if not ('Java(TM) SE Runtime Environment' in run('java -version')):
+        if not ('Java(TM) SE Runtime Environment (build 1.8' in run('java -version')):
             run('add-apt-repository ppa:webupd8team/java -y')
             apt_update(force=True)
 

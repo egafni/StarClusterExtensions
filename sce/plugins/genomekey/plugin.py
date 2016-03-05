@@ -42,7 +42,7 @@ class GenomeKeySetup(ClusterSetup):
 
         run_fab(init_aws_master, hosts=master)
         if self.setup_master_scratch:
-            run_fab(raid0_scratch_space, hosts=master)
+            raid0_scratch_space(node)
 
         run_fab(copy_genomekey_dev_environ, hosts=master)
 
@@ -59,13 +59,13 @@ class GenomeKeySetup(ClusterSetup):
         if node != master:
             raid0_scratch_space(node)
 
-        init_aws_node()
+        run_fab(init_aws_node, hosts=node)
 @trace
 def raid0_scratch_space(node):
     """
     Setup RAID0 with all available ephemeral discs
     """
-    execute(node, "apt-get install mdadm --no-install-recommends -y")
+    execute(node, "export DEBIAN_FRONTEND=noninteractive; apt-get install mdadm --no-install-recommends -y")
     mount_map = get_mount_map(node)
     if '/dev/md0' in mount_map:
         log.info('/dev/md0 already mounted, skipping')
@@ -81,4 +81,5 @@ def raid0_scratch_space(node):
                 'mdadm --create -R --verbose /dev/md0 --level=0 --name=SCRATCH --raid-devices=%s %s' % (len(ephemeral_devices), ' '.join(ephemeral_devices)))
         execute(node, 'sudo mkfs.ext4 -L SCRATCH /dev/md0')
         execute(node, 'mount LABEL=SCRATCH /scratch')
+        execute(node, 'cmod 777 /scratch')
         execute(node, 'chown -R genomekey:genomekey /scratch')

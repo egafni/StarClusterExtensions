@@ -51,7 +51,7 @@ class SGE_Plus_Setup(ClusterSetup):
 
     @trace
     def on_add_node(self, node, nodes, master, user, user_shell, volumes):
-        self._update_complex_list(node)
+        update_complex_list(node)
 
 @trace
 def update_complex_list(node):

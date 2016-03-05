@@ -13,7 +13,11 @@ def tobool(x):
         raise ValueError('Bad bool value: %s' % x)
 
 def apt_update(force=True):
-    s = run('stat -c %y /var/lib/apt/periodic/update-success-stamp')[0]
-    dt = datetime.now() - datetime.strptime(s[:10],"%Y-%m-%d")
-    if force or dt.days > 2:
-        run('apt-get update -y')
+    if not force:
+        # TODO this code seems to be broken?
+        s = run('stat -c %y /var/lib/apt/periodic/update-success-stamp')
+        dt = datetime.now() - datetime.strptime(s[:10],"%Y-%m-%d")
+        if dt.days < 2:
+            return
+
+    run('apt-get update -y')

@@ -81,5 +81,5 @@ def raid0_scratch_space(node):
                 'mdadm --create -R --verbose /dev/md0 --level=0 --name=SCRATCH --raid-devices=%s %s' % (len(ephemeral_devices), ' '.join(ephemeral_devices)))
         execute(node, 'sudo mkfs.ext4 -L SCRATCH /dev/md0')
         execute(node, 'mount LABEL=SCRATCH /scratch')
-        execute(node, 'cmod 777 /scratch')
+        execute(node, 'chmod 777 /scratch')
         execute(node, 'chown -R genomekey:genomekey /scratch')

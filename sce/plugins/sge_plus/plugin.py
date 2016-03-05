@@ -47,28 +47,31 @@ class SGE_Plus_Setup(ClusterSetup):
         for node in nodes:
             self.on_add_node(node, nodes, master, user, user_shell, volumes)
 
-    @trace
-    def _update_complex_list(self, node):
-        """
-        Sets a node's h_vmem and num_proc complex values
 
-        :param node: The node to update
-        """
-        log.info('Updating complex values for {0}'.format(node))
-        print execute(node, 'free -g|grep Mem:|grep -oE "[0-9]+"|head -1')
-        memtot = execute(node, 'free -g|grep Mem:|grep -oE "[0-9]+"|head -1')[0]
-        num_proc = self.master_slots if node.is_master() else execute(node, 'nproc')[0]
-        # scratch_mb= sp.check_output('df |grep scratch',shell=True).split()[3]
-        scratch_mb = 0
-
-        if node.is_master():
-            num_proc = int(num_proc / 2)
-
-        execute(node,
-                "qconf -rattr exechost complex_values slots={num_proc},num_proc={num_proc},sce_mem={mem}g,sce_scratch={scratch_mb} {node}".format(
-                    mem=memtot, num_proc=num_proc, node=node.alias, scratch_mb=scratch_mb)
-        )
 
     @trace
     def on_add_node(self, node, nodes, master, user, user_shell, volumes):
         self._update_complex_list(node)
+
+@trace
+def update_complex_list(node):
+    """
+    Sets a node's h_vmem and num_proc complex values
+
+    :param node: The node to update
+    """
+    log.info('Updating complex values for {0}'.format(node))
+    memtot = execute(node, 'free -g|grep Mem:|grep -oE "[0-9]+"|head -1')[0]
+    num_proc = self.master_slots if node.is_master() else execute(node, 'nproc')[0]
+    # scratch_mb= sp.check_output('df |grep scratch',shell=True).split()[3]
+    scratch_mb = 0
+
+    if node.is_master():
+        num_proc = int(num_proc / 2)
+
+    execute(node,
+            "qconf -rattr exechost complex_values slots={num_proc},num_proc={num_proc},sce_mem={mem}g,sce_scratch={scratch_mb} {node}".format(
+                mem=memtot, num_proc=num_proc, node=node.alias, scratch_mb=scratch_mb)
+    )
+
+    log.info('Done updating complex values')

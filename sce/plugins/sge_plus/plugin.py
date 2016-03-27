@@ -48,13 +48,13 @@ class SGE_Plus_Setup(ClusterSetup):
             self.on_add_node(node, nodes, master, user, user_shell, volumes)
 
 
-
     @trace
     def on_add_node(self, node, nodes, master, user, user_shell, volumes):
-        update_complex_list(node)
+        update_complex_list(node, num_proc=self.master_slots if node.is_master() else None)
+
 
 @trace
-def update_complex_list(node):
+def update_complex_list(node, num_proc=None):
     """
     Sets a node's h_vmem and num_proc complex values
 
@@ -62,7 +62,8 @@ def update_complex_list(node):
     """
     log.info('Updating complex values for {0}'.format(node))
     memtot = execute(node, 'free -g|grep Mem:|grep -oE "[0-9]+"|head -1')[0]
-    num_proc = self.master_slots if node.is_master() else execute(node, 'nproc')[0]
+
+    num_proc = num_proc if num_proc else execute(node, 'nproc')[0]
     # scratch_mb= sp.check_output('df |grep scratch',shell=True).split()[3]
     scratch_mb = 0
 

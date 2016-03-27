@@ -95,6 +95,7 @@ def chmod_opt(opt_path):
                 'gof3r/*/gof3r',
                 'fastqc/*/fastqc',
                 'cutadapt/*/bin/cutadapt',
+                'trim_galore/*/trim_galore',
                 'bin/run']
 
         for b in bins:

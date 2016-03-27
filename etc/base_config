@@ -77,7 +77,7 @@ MASTER_IS_EXEC_HOST = True # Required for sge_plus plugin to work
 
 [plugin createusers]
 SETUP_CLASS = starcluster.plugins.users.CreateUsers
-usernames = genomekey, egafni, oren
+usernames = genomekey
 DOWNLOAD_KEYS = True
 
 [plugin genomekey]

@@ -46,9 +46,9 @@ def init_node():
 
         # setup_scratch_space() - Using gluster.
 
-        with settings(user=GENOME_KEY_USER):
-            setup_aws_cli(True)
-            sync_genomekey_share()
+        # with settings(user=GENOME_KEY_USER):
+        #     setup_aws_cli(True)
+        #     sync_genomekey_share()
 
 
 @task

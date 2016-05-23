@@ -40,7 +40,8 @@ def init_node():
 
 
         # setup /scratch.  Currently just using the gluster volume.
-        run('ln -f -s /gluster/gv0/analysis /genomekey/analysis')
+        if not files.exists('/genomekey/analysis'):
+            run('ln -f -s /gluster/gv0/analysis /genomekey/analysis')
         run('chown -R genomekey:genomekey /genomekey')
         run('chown -R genomekey:genomekey /scratch')
 

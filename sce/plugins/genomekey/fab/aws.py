@@ -75,17 +75,17 @@ def init_master():
                                        'export PATH=$PATH:/opt/sge6/bin/linux-x64:$HOME/bin'])
 
 
-def sync_genomekey_share():
-    """
-    Requires that setup_aws_cli() has already been called
-    """
-    # with settings(user='root'):
-    # TODO change the AMI and delete this?  This runs instantly so not a big deal
-    # run('chown -R genomekey:genomekey /genomekey')
-    print 'sync genomekey share'
-    with hide('output'):
-        run('aws s3 sync s3://genomekey-data /genomekey/share')
-        chmod_opt('/genomekey/share/opt')
+# def sync_genomekey_share():
+#     """
+#     Requires that setup_aws_cli() has already been called
+#     """
+#     # with settings(user='root'):
+#     # TODO change the AMI and delete this?  This runs instantly so not a big deal
+#     # run('chown -R genomekey:genomekey /genomekey')
+#     print 'sync genomekey share'
+#     with hide('output'):
+#         run('aws s3 sync s3://genomekey-data /genomekey/share')
+#         chmod_opt('/genomekey/share/opt')
 
 
 def chmod_opt(opt_path):

@@ -5,3 +5,10 @@ qconf -se master # list info about a node, including complex values
 
 apt-get install sysstat
 iostat -x 1 3
+
+
+
+qconf -mp orte
+make sure all slots on the same machine:
+set: allocation_rule    $pe_slots
+http://gridengine.org/pipermail/users/2011-November/001932.html

@@ -17,7 +17,7 @@ KEY_LOCATION=~/.starcluster/genomekey_key.rsa
 
 [cluster genomekey]
 KEYNAME = genomekey_key
-NODE_IMAGE_ID = ami-4954ad29 # 0.4.3
+NODE_IMAGE_ID = ami-0234e762 # 0.4.4
 MASTER_INSTANCE_TYPE = d2.4xlarge
 SOT_BID = 0.25
 
